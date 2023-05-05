@@ -1,0 +1,10 @@
+server:
+  ip: 127.0.0.1
+  port: 8080
+database:
+  mysql:
+    host: 127.0.0.1
+    port: 3306
+    db: cloud_lock
+    user: root
+    password: mL&VFW3US
