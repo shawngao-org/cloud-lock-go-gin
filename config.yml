@@ -17,3 +17,4 @@ security:
   jwt:
     secret: 'h*Gq>Cu.0-G38oPti+-PkqA}s.g,69^t'
     timeout: 2592000
+develop: true

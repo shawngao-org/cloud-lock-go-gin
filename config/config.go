@@ -2,6 +2,7 @@ package config
 
 import (
 	"cloud-lock-go-gin/logger"
+	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v3"
 	"os"
 )
@@ -34,6 +35,7 @@ type Config struct {
 			Timeout int64  `yaml:"timeout"`
 		} `yaml:"jwt"`
 	} `yaml:"security"`
+	Develop bool `yaml:"develop"`
 }
 
 func getConfig() Config {
@@ -56,6 +58,11 @@ func getConfig() Config {
 		os.Exit(-1)
 	}
 	logger.LogSuccess("[Config] Configuration file '%s' -----> SUCCESS", configFileName)
+	if config.Develop {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	return config
 }
 
