@@ -14,6 +14,8 @@ import (
 
 func main() {
 	r := gin.Default()
+	r.Use(requestMiddleware())
+	r.Use(responseMiddleware())
 	router.LoadRouter(r)
 	srv := &http.Server{
 		Addr:    config.Conf.Server.Ip + ":" + config.Conf.Server.Port,
@@ -31,6 +33,24 @@ func startServer(srv *http.Server) {
 	err := srv.ListenAndServe()
 	if err != nil {
 		logger.LogWarn("%s", err)
+	}
+}
+
+func requestMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// request pre logic code
+
+		// next
+		c.Next()
+	}
+}
+
+func responseMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// request after logic code
+
+		// next
+		c.Next()
 	}
 }
 
