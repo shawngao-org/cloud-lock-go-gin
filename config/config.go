@@ -1,9 +1,12 @@
-package main
+package config
 
 import (
+	"cloud-lock-go-gin/logger"
 	"gopkg.in/yaml.v3"
 	"os"
 )
+
+var Conf = getConfig()
 
 type Config struct {
 	Server struct {
@@ -18,13 +21,25 @@ type Config struct {
 			User     string `yaml:"user"`
 			Password string `yaml:"password"`
 		} `yaml:"mysql"`
+		Redis struct {
+			Host     string `yaml:"host"`
+			Port     string `yaml:"port"`
+			Db       int    `yaml:"db"`
+			Password string `yaml:"password"`
+		} `yaml:"redis"`
 	} `yaml:"database"`
+	Security struct {
+		Jwt struct {
+			Secret  string `yaml:"secret"`
+			Timeout int64  `yaml:"timeout"`
+		} `yaml:"jwt"`
+	} `yaml:"security"`
 }
 
 func getConfig() Config {
 	configFileName := "config.yml"
 	if _, err := os.Stat(configFileName); os.IsNotExist(err) {
-		logErr("Configuration file is not exist !")
+		logger.LogErr("[Config] Configuration file is not exist !")
 		readFileErrLogImpl(configFileName, err)
 		os.Exit(-1)
 	}
@@ -40,12 +55,12 @@ func getConfig() Config {
 		readFileErrLogImpl(configFileName, err)
 		os.Exit(-1)
 	}
-	logSuccess("Read: configuration file '%s' -----> SUCCESS", configFileName)
+	logger.LogSuccess("[Config] Configuration file '%s' -----> SUCCESS", configFileName)
 	return config
 }
 
 func readFileErrLogImpl(fileName string, err error) {
-	logErr("Read: configuration file '%s' -----> FAILED", fileName)
-	logErr("%s", err)
+	logger.LogErr("[Config] Configuration file '%s' -----> FAILED", fileName)
+	logger.LogErr("%s", err)
 	os.Exit(-1)
 }

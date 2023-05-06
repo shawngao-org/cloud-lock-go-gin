@@ -8,3 +8,12 @@ database:
     db: cloud_lock
     user: root
     password: mL&VFW3US
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    db: 0
+    password: ''
+security:
+  jwt:
+    secret: 'h*Gq>Cu.0-G38oPti+-PkqA}s.g,69^t'
+    timeout: 2592000
