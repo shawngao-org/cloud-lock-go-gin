@@ -1,6 +1,8 @@
 package main
 
 import (
+	"cloud-lock-go-gin/config"
+	"cloud-lock-go-gin/logger"
 	"cloud-lock-go-gin/router"
 	"context"
 	"github.com/gin-gonic/gin"
@@ -10,16 +12,11 @@ import (
 	"time"
 )
 
-var conf = getConfig()
-var conn = connectDb(conf.Database.Mysql.Host, conf.Database.Mysql.Port,
-	conf.Database.Mysql.User, conf.Database.Mysql.Password,
-	conf.Database.Mysql.Db)
-
 func main() {
 	r := gin.Default()
 	router.LoadRouter(r)
 	srv := &http.Server{
-		Addr:    conf.Server.Ip + ":" + conf.Server.Port,
+		Addr:    config.Conf.Server.Ip + ":" + config.Conf.Server.Port,
 		Handler: r,
 	}
 	go func() {
@@ -29,11 +26,11 @@ func main() {
 }
 
 func startServer(srv *http.Server) {
-	logInfo("Start: Starting server...")
-	logSuccess("Listen: Listening address -----> %s", srv.Addr)
+	logger.LogInfo("[Server] Starting server...")
+	logger.LogSuccess("[Server] Listening address -----> %s", srv.Addr)
 	err := srv.ListenAndServe()
 	if err != nil {
-		logWarn("%s", err)
+		logger.LogWarn("%s", err)
 	}
 }
 
@@ -41,13 +38,13 @@ func shutdownServer(srv *http.Server) {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	logWarn("Shutdown: Shutdown server...")
+	logger.LogWarn("[Server] Shutdown server...")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	err := srv.Shutdown(ctx)
 	if err != nil {
-		logWarn("Shutdown: ")
-		logWarn("%s", err)
+		logger.LogWarn("[Server] ")
+		logger.LogWarn("%s", err)
 	}
-	logSuccess("Shutdown: Exited -----> SUCCESS")
+	logger.LogSuccess("[Server] Exited -----> SUCCESS")
 }
