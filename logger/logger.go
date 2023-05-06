@@ -1,4 +1,4 @@
-package main
+package logger
 
 import (
 	"fmt"
@@ -18,19 +18,19 @@ const (
 	Reset   = "\033[0m"
 )
 
-func logErr(format string, a ...any) {
+func LogErr(format string, a ...any) {
 	logImpl(Red+"["+getNowTimeString()+"] ERROR: "+format+"\n"+Reset, a...)
 }
 
-func logWarn(format string, a ...any) {
+func LogWarn(format string, a ...any) {
 	logImpl(Yellow+"["+getNowTimeString()+"] WARN: "+format+"\n"+Reset, a...)
 }
 
-func logInfo(format string, a ...any) {
+func LogInfo(format string, a ...any) {
 	logImpl(Blue+"["+getNowTimeString()+"] INFO: "+format+"\n"+Reset, a...)
 }
 
-func logSuccess(format string, a ...any) {
+func LogSuccess(format string, a ...any) {
 	logImpl(Green+"["+getNowTimeString()+"] INFO: "+format+"\n"+Reset, a...)
 }
 
