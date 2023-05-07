@@ -3,6 +3,7 @@ package main
 import (
 	"cloud-lock-go-gin/config"
 	"cloud-lock-go-gin/logger"
+	"cloud-lock-go-gin/middleware"
 	"cloud-lock-go-gin/router"
 	"context"
 	"github.com/gin-gonic/gin"
@@ -14,8 +15,9 @@ import (
 
 func main() {
 	r := gin.Default()
-	r.Use(requestMiddleware())
-	r.Use(responseMiddleware())
+	r.Use(middleware.RequestMiddleware())
+	r.Use(middleware.ResponseMiddleware())
+	//r.Use(middleware.AuthMiddleware())
 	router.LoadRouter(r)
 	srv := &http.Server{
 		Addr:    config.Conf.Server.Ip + ":" + config.Conf.Server.Port,
@@ -33,24 +35,6 @@ func startServer(srv *http.Server) {
 	err := srv.ListenAndServe()
 	if err != nil {
 		logger.LogWarn("%s", err)
-	}
-}
-
-func requestMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// request pre logic code
-
-		// next
-		c.Next()
-	}
-}
-
-func responseMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// request after logic code
-
-		// next
-		c.Next()
 	}
 }
 
