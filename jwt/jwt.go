@@ -12,7 +12,7 @@ func GenerateToken(username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS512)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user"] = username
-	claims["exp"] = time.Now().Add(time.Duration(config.Conf.Security.Jwt.Timeout)).Unix()
+	claims["exp"] = time.Now().Add(time.Duration(config.Conf.Security.Jwt.Timeout) * time.Second).Unix()
 	secret := []byte(config.Conf.Security.Jwt.Secret)
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
