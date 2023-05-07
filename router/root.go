@@ -1,10 +1,15 @@
 package router
 
 import (
+	"cloud-lock-go-gin/controller"
+	"cloud-lock-go-gin/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func RootRouter(r *gin.Engine) {
-	r.GET("/ping", ping)
-	r.POST("/login", login)
+	authorized := r.Group("/", middleware.AuthMiddleware())
+	{
+		authorized.GET("/ping", controller.Ping)
+	}
+	r.POST("/login", controller.Login)
 }
