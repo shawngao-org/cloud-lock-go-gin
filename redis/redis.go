@@ -5,7 +5,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-var RedisClient = redisConnect()
+var Client = redisConnect()
 
 func redisConnect() *redis.Client {
 	host := config.Conf.Database.Redis.Host
