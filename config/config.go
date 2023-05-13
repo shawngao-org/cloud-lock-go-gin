@@ -9,6 +9,8 @@ import (
 
 var Conf = getConfig()
 
+var pack = "config"
+
 type Config struct {
 	Server struct {
 		Ip   string `yaml:"ip"`
@@ -41,7 +43,7 @@ type Config struct {
 func getConfig() Config {
 	configFileName := "config.yml"
 	if _, err := os.Stat(configFileName); os.IsNotExist(err) {
-		logger.LogErr("[Config] Configuration file is not exist !")
+		logger.LogErr(pack, "Configuration file is not exist !")
 		readFileErrLogImpl(configFileName, err)
 		os.Exit(-1)
 	}
@@ -57,7 +59,7 @@ func getConfig() Config {
 		readFileErrLogImpl(configFileName, err)
 		os.Exit(-1)
 	}
-	logger.LogSuccess("[Config] Configuration file '%s' -----> SUCCESS", configFileName)
+	logger.LogSuccess(pack, "Configuration file '%s' -----> SUCCESS", configFileName)
 	if config.Develop {
 		gin.SetMode(gin.DebugMode)
 	} else {
@@ -67,7 +69,7 @@ func getConfig() Config {
 }
 
 func readFileErrLogImpl(fileName string, err error) {
-	logger.LogErr("[Config] Configuration file '%s' -----> FAILED", fileName)
-	logger.LogErr("%s", err)
+	logger.LogErr(pack, "Configuration file '%s' -----> FAILED", fileName)
+	logger.LogErr(pack, "%s", err)
 	os.Exit(-1)
 }

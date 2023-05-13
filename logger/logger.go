@@ -18,24 +18,43 @@ const (
 	Reset   = "\033[0m"
 )
 
-func LogErr(format string, a ...any) {
-	logImpl(Red+"["+getNowTimeString()+"] ERROR: "+format+"\n"+Reset, a...)
+func LogErr(pack string, format string, a ...any) {
+	logTypeImpl("error", pack, format, a...)
 }
 
-func LogWarn(format string, a ...any) {
-	logImpl(Yellow+"["+getNowTimeString()+"] WARN: "+format+"\n"+Reset, a...)
+func LogWarn(pack string, format string, a ...any) {
+	logTypeImpl("warn", pack, format, a...)
 }
 
-func LogInfo(format string, a ...any) {
-	logImpl(Blue+"["+getNowTimeString()+"] INFO: "+format+"\n"+Reset, a...)
+func LogInfo(pack string, format string, a ...any) {
+	logTypeImpl("info", pack, format, a...)
 }
 
-func LogSuccess(format string, a ...any) {
-	logImpl(Green+"["+getNowTimeString()+"] INFO: "+format+"\n"+Reset, a...)
+func LogSuccess(pack string, format string, a ...any) {
+	logTypeImpl("success", pack, format, a...)
 }
 
 func getNowTimeString() string {
-	return time.Now().String()
+	return time.Now().String()[0:19]
+}
+
+func logTypeImpl(typeStr string, pack string, format string, a ...any) {
+	color := Blue
+	tip := "INFO"
+	switch typeStr {
+	case "error":
+		color = Red
+		tip = "ERROR"
+		break
+	case "warn":
+		color = Yellow
+		tip = "WARN"
+		break
+	case "success":
+		color = Green
+		break
+	}
+	logImpl(color+"["+getNowTimeString()+"] ["+tip+"]: ["+pack+"] "+format+"\n"+Reset, a...)
 }
 
 func logImpl(format string, a ...any) {

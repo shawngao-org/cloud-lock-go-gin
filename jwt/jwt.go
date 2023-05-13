@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var pack = "jwt"
+
 func GenerateToken(username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS512)
 	claims := token.Claims.(jwt.MapClaims)
@@ -16,8 +18,8 @@ func GenerateToken(username string) (string, error) {
 	secret := []byte(config.Conf.Security.Jwt.Secret)
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
-		logger.LogErr("[Token] Token generate -----> FAILED")
-		logger.LogErr("%s", err)
+		logger.LogErr(pack, "Token generate -----> FAILED")
+		logger.LogErr(pack, "%s", err)
 		return "", err
 	}
 	return tokenString, nil

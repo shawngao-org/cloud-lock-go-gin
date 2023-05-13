@@ -10,6 +10,7 @@ import (
 )
 
 var Db = connectDb()
+var pack = "database"
 
 func connectDb() *gorm.DB {
 	host := config.Conf.Database.Mysql.Host
@@ -17,14 +18,14 @@ func connectDb() *gorm.DB {
 	user := config.Conf.Database.Mysql.User
 	pwd := config.Conf.Database.Mysql.Password
 	db := config.Conf.Database.Mysql.Db
-	logger.LogInfo("[MYSQL] Connecting to mysql server " + host + ":" + port + "...")
+	logger.LogInfo(pack, "Connecting to mysql server "+host+":"+port+"...")
 	uri := user + ":" + pwd + "@tcp(" + host + ":" + port + ")/" + db
 	dsn, err := gorm.Open(mysql.Open(uri), &gorm.Config{})
 	if err != nil {
-		logger.LogErr("[MYSQL] Connection to mysql server " + host + ":" + port + " -----> FAILED")
-		logger.LogErr("%s", err)
+		logger.LogErr(pack, "Connection to mysql server "+host+":"+port+" -----> FAILED")
+		logger.LogErr(pack, "%s", err)
 		os.Exit(-1)
 	}
-	logger.LogSuccess("[MYSQL] Connection to mysql server " + host + ":" + port + " -----> SUCCESS")
+	logger.LogSuccess(pack, "Connection to mysql server "+host+":"+port+" -----> SUCCESS")
 	return dsn
 }

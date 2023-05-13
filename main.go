@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+var pack = "main"
+
 func main() {
 	r := gin.Default()
 	r.Use(middleware.RequestMiddleware())
@@ -30,11 +32,11 @@ func main() {
 }
 
 func startServer(srv *http.Server) {
-	logger.LogInfo("[Server] Starting server...")
-	logger.LogSuccess("[Server] Listening address -----> %s", srv.Addr)
+	logger.LogInfo(pack, "Starting server...")
+	logger.LogSuccess(pack, "Listening address -----> %s", srv.Addr)
 	err := srv.ListenAndServe()
 	if err != nil {
-		logger.LogWarn("%s", err)
+		logger.LogWarn(pack, "%s", err)
 	}
 }
 
@@ -42,13 +44,12 @@ func shutdownServer(srv *http.Server) {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	logger.LogWarn("[Server] Shutdown server...")
+	logger.LogWarn(pack, "Shutdown server...")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	err := srv.Shutdown(ctx)
 	if err != nil {
-		logger.LogWarn("[Server] ")
-		logger.LogWarn("%s", err)
+		logger.LogWarn(pack, "%s", err)
 	}
-	logger.LogSuccess("[Server] Exited -----> SUCCESS")
+	logger.LogSuccess(pack, "Exited -----> SUCCESS")
 }
