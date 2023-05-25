@@ -2,15 +2,22 @@ package config
 
 import (
 	"cloud-lock-go-gin/logger"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"gopkg.in/yaml.v3"
 	"os"
+	"os/exec"
+	"runtime"
+	"sync"
 )
 
-var Conf = getConfig()
+var (
+	configMutex sync.Mutex
+	Conf        Config
+)
 
 var pack = "config"
 
@@ -69,7 +76,7 @@ func parseContent2Config(content []byte) Config {
 	return config
 }
 
-func getConfig() Config {
+func GetConfig() {
 	configFileName := "config.yml"
 	if _, err := os.Stat(configFileName); os.IsNotExist(err) {
 		logger.LogErr(pack, "Configuration file is not exist !")
@@ -90,10 +97,13 @@ func getConfig() Config {
 	}
 	if config.Nacos.Enable {
 		logger.LogInfo(pack, "Configuration file mode: Nacos unified configuration center")
-		return nacosMain(config)
+		nacosMain(config)
+		return
 	}
 	logger.LogInfo(pack, "Profile Mode: Local config file")
-	return config
+	configMutex.Lock()
+	Conf = config
+	configMutex.Unlock()
 }
 
 func readFileErrLogImpl(err error) {
@@ -102,7 +112,7 @@ func readFileErrLogImpl(err error) {
 	os.Exit(-1)
 }
 
-func nacosMain(config Config) Config {
+func nacosMain(config Config) {
 	sc := []constant.ServerConfig{{
 		IpAddr: config.Nacos.Ip,
 		Port:   config.Nacos.Port,
@@ -138,7 +148,30 @@ func nacosMain(config Config) Config {
 		OnChange: func(namespace, group, dataId, data string) {
 			logger.LogInfo(pack, "The configuration file has changed...")
 			logger.LogInfo(pack, "Group: %s, Data Id: %s", group, dataId)
+			configMutex.Lock()
+			Conf = parseContent2Config([]byte(data))
+			configMutex.Unlock()
+			sysType := runtime.GOOS
+			if sysType == "linux" {
+				f := "restart.sh"
+				if _, err := os.Stat(f); os.IsNotExist(err) {
+					logger.LogErr(pack, "Restart shell file is not exist ! [restart.sh]")
+					logger.LogErr(pack, "Need to manually restart the server.")
+				} else {
+					cmd := exec.Command("/bin/bash", "-c", "./"+f)
+					bytes, err := cmd.Output()
+					if err != nil {
+						logger.LogErr(pack, "%s", err)
+						return
+					}
+					fmt.Println(string(bytes))
+				}
+			} else {
+				logger.LogErr(pack, "Need to manually restart the server.")
+			}
 		},
 	})
-	return parseContent2Config([]byte(content))
+	configMutex.Lock()
+	Conf = parseContent2Config([]byte(content))
+	configMutex.Unlock()
 }
