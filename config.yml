@@ -17,4 +17,18 @@ security:
   jwt:
     secret: 'h*Gq>Cu.0-G38oPti+-PkqA}s.g,69^t'
     timeout: 2592000
+  rsa:
+    public: 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALEq7Tr9cumEWevYdcaEC0ZeYzxtXn5nW/8jxLYVqhu6S+jCQwovWJqi++tMUcxIDH6rZF/RSlLp6PqMNKIdI1kCAwEAAQ=='
+    private: 'MIIBUgIBADANBgkqhkiG9w0BAQEFAASCATwwggE4AgEAAkEAsSrtOv1y6YRZ69h1xoQLRl5jPG1efmdb/yPEthWqG7pL6MJDCi9YmqL760xRzEgMfqtkX9FKUuno+ow0oh0jWQIDAQABAj8GKMSwLrkcy5a7HEtiTptI8Ji1zeRhgJzLwfKUyF87MRZndgV9EGdmBAkUaNl8TWPOJ/GDnMuq862DCBEaw7sCIQDkLxeN75pBYF0UYGYFFXD4zHkTOvG6IwlVE0k6U/P14wIhAMbDxrxOxjURcBLRg6jmP1WifpQpBK2EzgJAKbQ7/+aTAiBW3AI4WlO6vSbRYdyT5NSLMLKJ+m8XrsyXoO7IEDsWhwIgTO59v2jmAqhLLp11TixAG08XmxT9QIQEkI5xFdebRo0CIGiC+z1wW5OShQsOIOrFsuq3NfS9kJshYzHUGzrZIVOY'
+nacos:
+  enable: true
+  ip: 10.4.61.203
+  port: 8848
+  username: nacos
+  password: Ahhhjtll1125
+  namespace: 0ead3860-538a-4029-8246-7b95f20ff526
+  group: dev
+  dataId: gin-config.yaml
+  timeout: 5000
+  loglevel: debug
 develop: true

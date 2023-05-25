@@ -3,6 +3,9 @@ package config
 import (
 	"cloud-lock-go-gin/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/nacos-group/nacos-sdk-go/clients"
+	"github.com/nacos-group/nacos-sdk-go/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/vo"
 	"gopkg.in/yaml.v3"
 	"os"
 )
@@ -36,40 +39,106 @@ type Config struct {
 			Secret  string `yaml:"secret"`
 			Timeout int64  `yaml:"timeout"`
 		} `yaml:"jwt"`
+		Rsa struct {
+			Public  string `yaml:"public"`
+			Private string `yaml:"private"`
+		} `yaml:"rsa"`
 	} `yaml:"security"`
+	Nacos struct {
+		Enable    bool   `yaml:"enable"`
+		Ip        string `yaml:"ip"`
+		Port      uint64 `yaml:"port"`
+		Username  string `yaml:"username"`
+		Password  string `yaml:"password"`
+		Namespace string `yaml:"namespace"`
+		Group     string `yaml:"group"`
+		DataId    string `yaml:"dataId"`
+		Timeout   uint64 `yaml:"timeout"`
+		Loglevel  string `yaml:"loglevel"`
+	} `yaml:"nacos"`
 	Develop bool `yaml:"develop"`
+}
+
+func parseContent2Config(content []byte) Config {
+	var config Config
+	err := yaml.Unmarshal(content, &config)
+	if err != nil {
+		readFileErrLogImpl(err)
+		os.Exit(-1)
+	}
+	return config
 }
 
 func getConfig() Config {
 	configFileName := "config.yml"
 	if _, err := os.Stat(configFileName); os.IsNotExist(err) {
 		logger.LogErr(pack, "Configuration file is not exist !")
-		readFileErrLogImpl(configFileName, err)
+		readFileErrLogImpl(err)
 		os.Exit(-1)
 	}
 	content, err := os.ReadFile(configFileName)
 	if err != nil {
-		readFileErrLogImpl(configFileName, err)
+		readFileErrLogImpl(err)
 		os.Exit(-1)
 	}
-
-	var config Config
-	err = yaml.Unmarshal(content, &config)
-	if err != nil {
-		readFileErrLogImpl(configFileName, err)
-		os.Exit(-1)
-	}
+	config := parseContent2Config(content)
 	logger.LogSuccess(pack, "Configuration file '%s' -----> SUCCESS", configFileName)
 	if config.Develop {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 	}
+	if config.Nacos.Enable {
+		logger.LogInfo(pack, "Configuration file mode: Nacos unified configuration center")
+		return nacosMain(config)
+	}
+	logger.LogInfo(pack, "Profile Mode: Local config file")
 	return config
 }
 
-func readFileErrLogImpl(fileName string, err error) {
-	logger.LogErr(pack, "Configuration file '%s' -----> FAILED", fileName)
+func readFileErrLogImpl(err error) {
+	logger.LogErr(pack, "Configuration file '%s' -----> FAILED")
 	logger.LogErr(pack, "%s", err)
 	os.Exit(-1)
+}
+
+func nacosMain(config Config) Config {
+	sc := []constant.ServerConfig{{
+		IpAddr: config.Nacos.Ip,
+		Port:   config.Nacos.Port,
+	}}
+	cc := constant.ClientConfig{
+		NamespaceId:         config.Nacos.Namespace,
+		TimeoutMs:           config.Nacos.Timeout,
+		NotLoadCacheAtStart: true,
+		LogDir:              "log",
+		LogLevel:            config.Nacos.Loglevel,
+		Username:            config.Nacos.Username,
+		Password:            config.Nacos.Password,
+	}
+	configClient, err := clients.CreateConfigClient(map[string]interface{}{
+		"serverConfigs": sc,
+		"clientConfig":  cc,
+	})
+	if err != nil {
+		logger.LogErr(pack, "%s", err)
+		os.Exit(-1)
+	}
+	content, err := configClient.GetConfig(vo.ConfigParam{
+		DataId: config.Nacos.DataId,
+		Group:  config.Nacos.Group,
+	})
+	if err != nil {
+		logger.LogErr(pack, "%s", err)
+		os.Exit(-1)
+	}
+	err = configClient.ListenConfig(vo.ConfigParam{
+		DataId: config.Nacos.DataId,
+		Group:  config.Nacos.Group,
+		OnChange: func(namespace, group, dataId, data string) {
+			logger.LogInfo(pack, "The configuration file has changed...")
+			logger.LogInfo(pack, "Group: %s, Data Id: %s", group, dataId)
+		},
+	})
+	return parseContent2Config([]byte(content))
 }
