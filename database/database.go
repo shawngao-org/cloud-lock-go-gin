@@ -7,12 +7,17 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"os"
+	"sync"
 )
 
-var Db = connectDb()
+var (
+	DbMutex sync.Mutex
+	Db      *gorm.DB
+)
+
 var pack = "database"
 
-func connectDb() *gorm.DB {
+func ConnectDb() {
 	host := config.Conf.Database.Mysql.Host
 	port := config.Conf.Database.Mysql.Port
 	user := config.Conf.Database.Mysql.User
@@ -27,5 +32,7 @@ func connectDb() *gorm.DB {
 		os.Exit(-1)
 	}
 	logger.LogSuccess(pack, "Connection to mysql server "+host+":"+port+" -----> SUCCESS")
-	return dsn
+	DbMutex.Lock()
+	Db = dsn
+	DbMutex.Unlock()
 }
