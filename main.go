@@ -16,6 +16,10 @@ import (
 var pack = "main"
 
 func main() {
+	serverHandle()
+}
+
+func serverHandle() {
 	r := gin.Default()
 	r.Use(middleware.RequestMiddleware())
 	r.Use(middleware.ResponseMiddleware())
