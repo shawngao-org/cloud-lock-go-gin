@@ -147,12 +147,12 @@ func nacosMain(config Config) {
 		DataId: config.Nacos.DataId,
 		Group:  config.Nacos.Group,
 		OnChange: func(namespace, group, dataId, data string) {
+			logger.LogInfo(pack, "The configuration file has changed...")
+			logger.LogInfo(pack, "Group: %s, Data Id: %s", group, dataId)
+			configMutex.Lock()
+			Conf = parseContent2Config([]byte(data))
+			configMutex.Unlock()
 			if runtime.GOOS == "linux" {
-				logger.LogInfo(pack, "The configuration file has changed...")
-				logger.LogInfo(pack, "Group: %s, Data Id: %s", group, dataId)
-				configMutex.Lock()
-				Conf = parseContent2Config([]byte(data))
-				configMutex.Unlock()
 				logger.LogWarn(pack, "The server is restarting, please wait a few seconds...")
 				cmd := exec.Command("sh", "-c", "sleep 3 && exit 0")
 				cmd.Stdout = os.Stdout
@@ -167,6 +167,7 @@ func nacosMain(config Config) {
 				time.Sleep(1 * time.Second)
 				binary, err := exec.LookPath(os.Args[0])
 				if err != nil {
+					logger.LogErr(pack, "Can't get executable binary.")
 					logger.LogErr(pack, "Need to manually restart the server.")
 					logger.LogErr(pack, "%s", err)
 				}
@@ -177,7 +178,9 @@ func nacosMain(config Config) {
 				}
 			} else {
 				logger.LogErr(pack, "Need to manually restart the server.")
+				logger.LogErr(pack, "Config hot reload is not support Windows OS.")
 			}
+
 		},
 	})
 	configMutex.Lock()
