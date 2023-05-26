@@ -2,7 +2,6 @@ package config
 
 import (
 	"cloud-lock-go-gin/logger"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
@@ -12,6 +11,8 @@ import (
 	"os/exec"
 	"runtime"
 	"sync"
+	"syscall"
+	"time"
 )
 
 var (
@@ -146,25 +147,33 @@ func nacosMain(config Config) {
 		DataId: config.Nacos.DataId,
 		Group:  config.Nacos.Group,
 		OnChange: func(namespace, group, dataId, data string) {
-			logger.LogInfo(pack, "The configuration file has changed...")
-			logger.LogInfo(pack, "Group: %s, Data Id: %s", group, dataId)
-			configMutex.Lock()
-			Conf = parseContent2Config([]byte(data))
-			configMutex.Unlock()
-			sysType := runtime.GOOS
-			if sysType == "linux" {
-				f := "restart.sh"
-				if _, err := os.Stat(f); os.IsNotExist(err) {
-					logger.LogErr(pack, "Restart shell file is not exist ! [restart.sh]")
+			if runtime.GOOS == "linux" {
+				logger.LogInfo(pack, "The configuration file has changed...")
+				logger.LogInfo(pack, "Group: %s, Data Id: %s", group, dataId)
+				configMutex.Lock()
+				Conf = parseContent2Config([]byte(data))
+				configMutex.Unlock()
+				logger.LogWarn(pack, "The server is restarting, please wait a few seconds...")
+				cmd := exec.Command("sh", "-c", "sleep 3 && exit 0")
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				if err := cmd.Start(); err != nil {
+					logger.LogErr(pack, "Error starting command: %s", err)
+					os.Exit(1)
+				}
+				if err := cmd.Wait(); err != nil {
+					logger.LogErr(pack, "Command finished with error: %s", err)
+				}
+				time.Sleep(1 * time.Second)
+				binary, err := exec.LookPath(os.Args[0])
+				if err != nil {
 					logger.LogErr(pack, "Need to manually restart the server.")
-				} else {
-					cmd := exec.Command("/bin/bash", "-c", "./"+f)
-					bytes, err := cmd.Output()
-					if err != nil {
-						logger.LogErr(pack, "%s", err)
-						return
-					}
-					fmt.Println(string(bytes))
+					logger.LogErr(pack, "%s", err)
+				}
+				err = syscall.Exec(binary, os.Args, os.Environ())
+				if err != nil {
+					logger.LogErr(pack, "Need to manually restart the server.")
+					logger.LogErr(pack, "%s", err)
 				}
 			} else {
 				logger.LogErr(pack, "Need to manually restart the server.")
