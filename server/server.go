@@ -35,6 +35,7 @@ func ServerHandle() {
 
 func startServer(srv *http.Server) {
 	logger.LogInfo(pack, "Starting server...")
+	logger.LogStarted()
 	logger.LogSuccess(pack, "Listening address -----> %s", srv.Addr)
 	err := srv.ListenAndServe()
 	if err != nil {
