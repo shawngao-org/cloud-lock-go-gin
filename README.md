@@ -2,9 +2,9 @@
   <a href="#">
     <img alt="CloudEntry" src="./no-text-logo.svg" alt="Logo" width="80"/>
   </a>
-  <p style="font-size: 2rem;">
+  <h1>
     CloudEntry
-  </p>
+  </h1>
 </div>
 <span align="center">
 
