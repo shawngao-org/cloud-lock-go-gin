@@ -180,7 +180,6 @@ func nacosMain(config Config) {
 				logger.LogErr(pack, "Need to manually restart the server.")
 				logger.LogErr(pack, "Config hot reload is not support Windows OS.")
 			}
-
 		},
 	})
 	configMutex.Lock()
