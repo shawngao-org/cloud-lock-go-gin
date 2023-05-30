@@ -12,5 +12,4 @@ func RootRouter(r *gin.Engine) {
 		authorized.GET("/ping", controller.Ping)
 	}
 	r.POST("/login", controller.Login)
-	r.POST("/test", controller.Test)
 }
