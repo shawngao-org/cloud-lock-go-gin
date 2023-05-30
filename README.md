@@ -1,11 +1,11 @@
-<p align="center">
+<div align="center">
   <a href="#">
     <img alt="CloudEntry" src="./no-text-logo.svg" alt="Logo" width="80"/>
   </a>
-</p>
-<h1 align="center">
-  CloudEntry
-</h1>
+  <p style="font-size: 2rem;">
+    CloudEntry
+  </p>
+</div>
 <span align="center">
 
 ![badge](https://img.shields.io/badge/license-GPL-green?style=for-the-badge)
