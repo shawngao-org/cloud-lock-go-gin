@@ -1,4 +1,4 @@
-package jwt
+package util
 
 import (
 	"cloud-lock-go-gin/config"
