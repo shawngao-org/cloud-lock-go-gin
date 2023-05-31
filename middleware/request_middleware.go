@@ -1,16 +1,17 @@
 package middleware
 
 import (
-	"cloud-lock-go-gin/jwt"
+	"cloud-lock-go-gin/database"
 	"cloud-lock-go-gin/logger"
+	"cloud-lock-go-gin/util"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"net/http"
 )
 
 func RequestMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// request pre logic code
-		// next
 		c.Next()
 	}
 }
@@ -18,11 +19,11 @@ func RequestMiddleware() gin.HandlerFunc {
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("token")
-		jt, err := jwt.ParseToken(token)
+		jt, err := util.ParseToken(token)
 		if err != nil {
-			logger.LogErr("AuthMiddleware", "%s", err)
-			c.AbortWithStatus(http.StatusForbidden)
-			c.JSON(http.StatusForbidden, gin.H{
+			logger.LogErr("%s", err)
+			c.AbortWithStatus(http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"message":   "Invalid token format.",
 				"exception": err.Error(),
 			})
@@ -30,12 +31,26 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 		err = jt.Claims.Valid()
 		if err != nil {
-			logger.LogErr("AuthMiddleware", "%s", err)
-			c.AbortWithStatus(http.StatusForbidden)
-			c.JSON(http.StatusForbidden, gin.H{
+			logger.LogErr("%s", err)
+			c.AbortWithStatus(http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"message":   "Invalid token.",
 				"exception": err.Error(),
 			})
+			return
+		}
+		uid := int64(jt.Claims.(jwt.MapClaims)["user"].(float64))
+		r, e := database.CheckRouterPermission(c.Request.URL.Path, uid)
+		if e != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"exception": e.Error(),
+			})
+			return
+		}
+		if !r {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{})
 			return
 		}
 		c.Next()
