@@ -8,12 +8,10 @@ import (
 	"time"
 )
 
-var pack = "jwt"
-
-func GenerateToken(username string) (string, error) {
+func GenerateToken(id int64) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS512)
 	claims := token.Claims.(jwt.MapClaims)
-	claims["user"] = username
+	claims["user"] = id
 	claims["exp"] = time.Now().Add(time.Duration(config.Conf.Security.Jwt.Timeout) * time.Second).Unix()
 	secret := []byte(config.Conf.Security.Jwt.Secret)
 	tokenString, err := token.SignedString(secret)
