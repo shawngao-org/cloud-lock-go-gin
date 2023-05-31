@@ -20,8 +20,6 @@ var (
 	Conf        Config
 )
 
-var pack = "config"
-
 type Config struct {
 	Server struct {
 		Ip   string `yaml:"ip"`
@@ -80,7 +78,7 @@ func parseContent2Config(content []byte) Config {
 func GetConfig() {
 	configFileName := "config.yml"
 	if _, err := os.Stat(configFileName); os.IsNotExist(err) {
-		logger.LogErr(pack, "Configuration file is not exist !")
+		logger.LogErr("Configuration file is not exist !")
 		readFileErrLogImpl(err)
 		os.Exit(-1)
 	}
@@ -90,26 +88,26 @@ func GetConfig() {
 		os.Exit(-1)
 	}
 	config := parseContent2Config(content)
-	logger.LogSuccess(pack, "Configuration file '%s' -----> SUCCESS", configFileName)
+	logger.LogSuccess("Configuration file '%s' -----> SUCCESS", configFileName)
 	if config.Develop {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	if config.Nacos.Enable {
-		logger.LogInfo(pack, "Configuration file mode: Nacos unified configuration center")
+		logger.LogInfo("Configuration file mode: Nacos unified configuration center")
 		nacosMain(config)
 		return
 	}
-	logger.LogInfo(pack, "Profile Mode: Local config file")
+	logger.LogInfo("Profile Mode: Local config file")
 	configMutex.Lock()
 	Conf = config
 	configMutex.Unlock()
 }
 
 func readFileErrLogImpl(err error) {
-	logger.LogErr(pack, "Configuration file '%s' -----> FAILED")
-	logger.LogErr(pack, "%s", err)
+	logger.LogErr("Configuration file '%s' -----> FAILED")
+	logger.LogErr("%s", err)
 	os.Exit(-1)
 }
 
@@ -132,7 +130,7 @@ func nacosMain(config Config) {
 		"clientConfig":  cc,
 	})
 	if err != nil {
-		logger.LogErr(pack, "%s", err)
+		logger.LogErr("%s", err)
 		os.Exit(-1)
 	}
 	content, err := configClient.GetConfig(vo.ConfigParam{
@@ -140,45 +138,45 @@ func nacosMain(config Config) {
 		Group:  config.Nacos.Group,
 	})
 	if err != nil {
-		logger.LogErr(pack, "%s", err)
+		logger.LogErr("%s", err)
 		os.Exit(-1)
 	}
 	err = configClient.ListenConfig(vo.ConfigParam{
 		DataId: config.Nacos.DataId,
 		Group:  config.Nacos.Group,
 		OnChange: func(namespace, group, dataId, data string) {
-			logger.LogInfo(pack, "The configuration file has changed...")
-			logger.LogInfo(pack, "Group: %s, Data Id: %s", group, dataId)
+			logger.LogInfo("The configuration file has changed...")
+			logger.LogInfo("Group: %s, Data Id: %s", group, dataId)
 			configMutex.Lock()
 			Conf = parseContent2Config([]byte(data))
 			configMutex.Unlock()
 			if runtime.GOOS == "linux" {
-				logger.LogWarn(pack, "The server is restarting, please wait a few seconds...")
+				logger.LogWarn("The server is restarting, please wait a few seconds...")
 				cmd := exec.Command("sh", "-c", "sleep 3 && exit 0")
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
 				if err := cmd.Start(); err != nil {
-					logger.LogErr(pack, "Error starting command: %s", err)
+					logger.LogErr("Error starting command: %s", err)
 					os.Exit(1)
 				}
 				if err := cmd.Wait(); err != nil {
-					logger.LogErr(pack, "Command finished with error: %s", err)
+					logger.LogErr("Command finished with error: %s", err)
 				}
 				time.Sleep(1 * time.Second)
 				binary, err := exec.LookPath(os.Args[0])
 				if err != nil {
-					logger.LogErr(pack, "Can't get executable binary.")
-					logger.LogErr(pack, "Need to manually restart the server.")
-					logger.LogErr(pack, "%s", err)
+					logger.LogErr("Can't get executable binary.")
+					logger.LogErr("Need to manually restart the server.")
+					logger.LogErr("%s", err)
 				}
 				err = syscall.Exec(binary, os.Args, os.Environ())
 				if err != nil {
-					logger.LogErr(pack, "Need to manually restart the server.")
-					logger.LogErr(pack, "%s", err)
+					logger.LogErr("Need to manually restart the server.")
+					logger.LogErr("%s", err)
 				}
 			} else {
-				logger.LogErr(pack, "Need to manually restart the server.")
-				logger.LogErr(pack, "Config hot reload is not support Windows OS.")
+				logger.LogErr("Need to manually restart the server.")
+				logger.LogErr("Config hot reload is not support Windows OS.")
 			}
 		},
 	})
