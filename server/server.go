@@ -19,7 +19,6 @@ func ServerHandle() {
 	r := gin.Default()
 	r.Use(middleware.RequestMiddleware())
 	r.Use(middleware.ResponseMiddleware())
-	//r.Use(middleware.AuthMiddleware())
 	router.LoadRouter(r)
 	srv := &http.Server{
 		Addr:    config.Conf.Server.Ip + ":" + config.Conf.Server.Port,
