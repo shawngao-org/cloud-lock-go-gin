@@ -7,6 +7,7 @@ import (
 	"cloud-lock-go-gin/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -36,7 +37,9 @@ func Login(context *gin.Context) {
 		return
 	}
 	err = redis.Client.Set(context,
-		token, username, time.Duration(config.Conf.Security.Jwt.Timeout)*time.Second,
+		strconv.FormatInt(user.Id, 10),
+		token,
+		time.Duration(config.Conf.Security.Jwt.Timeout)*time.Second,
 	).Err()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
