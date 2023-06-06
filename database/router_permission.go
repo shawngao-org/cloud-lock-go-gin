@@ -5,8 +5,8 @@ import (
 )
 
 type RouterPermission struct {
-	Uid        int64  `gorm:"uniqueIndex:uid_permission"`
-	Permission string `gorm:"uniqueIndex:uid_permission"`
+	Uid        int64  `gorm:"uniqueIndex:uid_permission;column:uid;not null;"`
+	Permission string `gorm:"uniqueIndex:uid_permission;column:permission;not null;size:64;"`
 }
 
 func ExistRouterPermission(uid int64, p string) bool {
