@@ -28,6 +28,13 @@ database:
     db: 0
     # Redis 密码(默认为空)
     password: ''
+  influxdb:
+    enable: true
+    host: 10.4.61.203
+    port: 8086
+    token: 'JMlafqZKc9URI0AAVr7J7i0QEGTuOX1_5qN_kmCEOf01-PypsbvowMWmHIau2EgWMs1Ak3-8kQGQZQP7nZY14w=='
+    org: shawngao
+    bucket: request_log
 # 安全相关配置
 security:
   # JWT

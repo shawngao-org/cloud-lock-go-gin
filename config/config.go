@@ -39,6 +39,14 @@ type Config struct {
 			Db       int    `yaml:"db"`
 			Password string `yaml:"password"`
 		} `yaml:"redis"`
+		Influxdb struct {
+			Enable bool   `yaml:"enable"`
+			Host   string `yaml:"host"`
+			Port   string `yaml:"port"`
+			Token  string `yaml:"token"`
+			Org    string `yaml:"org"`
+			Bucket string `yaml:"bucket"`
+		} `yaml:"influxdb"`
 	} `yaml:"database"`
 	Security struct {
 		Jwt struct {
