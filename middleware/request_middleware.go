@@ -18,6 +18,10 @@ func RequestMiddleware() gin.HandlerFunc {
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if config.Conf.Develop {
+			c.Next()
+			return
+		}
 		token := c.Request.Header.Get("token")
 		jt, err := util.ParseToken(token)
 		if err != nil {
