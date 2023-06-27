@@ -2,10 +2,8 @@ package server
 
 import (
 	"cloud-lock-go-gin/config"
-	"cloud-lock-go-gin/database"
 	"cloud-lock-go-gin/logger"
 	"cloud-lock-go-gin/middleware"
-	"cloud-lock-go-gin/redis"
 	"cloud-lock-go-gin/router"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/context"
@@ -55,9 +53,4 @@ func shutdownServer(srv *http.Server) {
 		logger.LogWarn("%s", err)
 	}
 	logger.LogSuccess("Exited")
-}
-
-func Connect() {
-	database.ConnectDb()
-	redis.RedisConnect()
 }
