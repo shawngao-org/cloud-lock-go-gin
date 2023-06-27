@@ -33,7 +33,7 @@ func ConnectInfluxDb() {
 	InfluxMutex.Unlock()
 }
 
-func WriteReqLog(uid int64, path string, method string) {
+func WriteReqLog(uid int64, path string, method string, ip string) {
 	if !config.Conf.Database.Influxdb.Enable {
 		return
 	}
