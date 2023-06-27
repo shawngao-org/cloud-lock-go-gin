@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func ServerHandle() {
+func HandleServer() {
 	r := gin.Default()
 	r.Use(middleware.RequestMiddleware())
 	r.Use(middleware.ResponseMiddleware())

@@ -13,5 +13,5 @@ func main() {
 	influxdb.ConnectInfluxDb()
 	database.ConnectDb()
 	redis.RedisConnect()
-	server.ServerHandle()
+	server.HandleServer()
 }
