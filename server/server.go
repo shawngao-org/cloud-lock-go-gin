@@ -20,6 +20,9 @@ func ServerHandle() {
 	r.Use(middleware.RequestMiddleware())
 	r.Use(middleware.ResponseMiddleware())
 	router.LoadRouter(r)
+	for _, info := range r.Routes() {
+		logger.LogInfo("[" + info.Method + "] => [" + info.Path + "]")
+	}
 	srv := &http.Server{
 		Addr:    config.Conf.Server.Ip + ":" + config.Conf.Server.Port,
 		Handler: r,
