@@ -27,7 +27,7 @@ func ConnectInfluxDb() {
 	logger.LogInfo("Connecting to InfluxDb server " + host + ":" + port + "...")
 	uri := "http://" + host + ":" + port
 	client := influxdb2.NewClient(uri, token)
-	logger.LogSuccess("Connection to InfluxDb server " + host + ":" + port + " -----> SUCCESS")
+	logger.LogSuccess("Connection to InfluxDb server " + host + ":" + port)
 	InfluxMutex.Lock()
 	Influx = client
 	InfluxMutex.Unlock()
@@ -44,7 +44,7 @@ func WriteReqLog(uid int64, path string, method string) {
 		"uid": strconv.FormatInt(uid, 10),
 	}
 	fields := map[string]interface{}{
-		"event": "[" + method + "] " + path,
+		"event": "[" + method + "] [" + ip + "] " + path,
 	}
 	point := write.NewPoint("req_log", tags, fields, time.Now())
 	if err := writeAPI.WritePoint(context.Background(), point); err != nil {

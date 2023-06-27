@@ -33,7 +33,7 @@ func ServerHandle() {
 func startServer(srv *http.Server) {
 	logger.LogInfo("Starting server...")
 	logger.LogStarted()
-	logger.LogSuccess("Listening address -----> %s", srv.Addr)
+	logger.LogSuccess("Listening address: %s", srv.Addr)
 	err := srv.ListenAndServe()
 	if err != nil {
 		logger.LogWarn("%s", err)
@@ -51,7 +51,7 @@ func shutdownServer(srv *http.Server) {
 	if err != nil {
 		logger.LogWarn("%s", err)
 	}
-	logger.LogSuccess("Exited -----> SUCCESS")
+	logger.LogSuccess("Exited")
 }
 
 func Connect() {

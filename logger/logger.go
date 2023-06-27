@@ -7,14 +7,13 @@ import (
 )
 
 const (
-	Black   = "\033[1;30m"
-	Red     = "\033[1;31m"
-	Green   = "\033[1;32m"
-	Yellow  = "\033[1;33m"
-	Blue    = "\033[1;34m"
-	Magenta = "\033[1;35m"
-	Cyan    = "\033[1;36m"
-	White   = "\033[1;37m"
+	Green   = "\033[97;42m"
+	White   = "\033[90;47m"
+	Yellow  = "\033[97;43m"
+	Red     = "\033[97;41m"
+	Blue    = "\033[97;44m"
+	Magenta = "\033[97;45m"
+	Cyan    = "\033[97;46m"
 	Reset   = "\033[0m"
 )
 
@@ -76,9 +75,10 @@ func logTypeImpl(typeStr string, format string, a ...any) {
 		break
 	case "success":
 		color = Green
+		tip = "DONE"
 		break
 	}
-	logImpl(color+"["+getNowTimeString()+"] ["+tip+"]: "+format+"\n"+Reset, a...)
+	logImpl(Reset+"["+getNowTimeString()+"] |"+color+tip+Reset+"|"+": "+format+"\n"+Reset, a...)
 }
 
 func logImpl(format string, a ...any) {

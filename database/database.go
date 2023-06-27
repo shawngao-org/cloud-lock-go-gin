@@ -25,11 +25,11 @@ func ConnectDb() {
 	uri := user + ":" + pwd + "@tcp(" + host + ":" + port + ")/" + db
 	dsn, err := gorm.Open(mysql.Open(uri), &gorm.Config{})
 	if err != nil {
-		logger.LogErr("Connection to mysql server " + host + ":" + port + " -----> FAILED")
+		logger.LogErr("Connection to mysql server " + host + ":" + port + "")
 		logger.LogErr("%s", err)
 		os.Exit(-1)
 	}
-	logger.LogSuccess("Connection to mysql server " + host + ":" + port + " -----> SUCCESS")
+	logger.LogSuccess("Connection to mysql server " + host + ":" + port + "")
 	DbMutex.Lock()
 	Db = dsn
 	DbMutex.Unlock()

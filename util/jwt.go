@@ -16,7 +16,7 @@ func GenerateToken(id int64) (string, error) {
 	secret := []byte(config.Conf.Security.Jwt.Secret)
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
-		logger.LogErr("Token generate -----> FAILED")
+		logger.LogErr("Token generate")
 		logger.LogErr("%s", err)
 		return "", err
 	}

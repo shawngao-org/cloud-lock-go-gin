@@ -96,7 +96,7 @@ func GetConfig() {
 		os.Exit(-1)
 	}
 	config := parseContent2Config(content)
-	logger.LogSuccess("Configuration file '%s' -----> SUCCESS", configFileName)
+	logger.LogSuccess("Configuration file '%s'", configFileName)
 	if config.Develop {
 		gin.SetMode(gin.DebugMode)
 	} else {
@@ -114,7 +114,7 @@ func GetConfig() {
 }
 
 func readFileErrLogImpl(err error) {
-	logger.LogErr("Configuration file '%s' -----> FAILED")
+	logger.LogErr("Configuration file '%s'")
 	logger.LogErr("%s", err)
 	os.Exit(-1)
 }
