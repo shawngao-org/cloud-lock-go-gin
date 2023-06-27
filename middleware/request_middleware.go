@@ -3,6 +3,7 @@ package middleware
 import (
 	"cloud-lock-go-gin/config"
 	"cloud-lock-go-gin/database"
+	"cloud-lock-go-gin/influxdb"
 	"cloud-lock-go-gin/logger"
 	"cloud-lock-go-gin/redis"
 	"cloud-lock-go-gin/util"
@@ -69,6 +70,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, gin.H{})
 			return
 		}
+		influxdb.WriteReqLog(uid, c.Request.URL.Path, c.Request.Method, c.ClientIP())
 		c.Next()
 	}
 }
