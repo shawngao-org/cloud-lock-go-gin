@@ -9,7 +9,7 @@ type User struct {
 	Id       int64  `gorm:"primaryKey;column:id;autoIncrement;not null;"`
 	Name     string `gorm:"uniqueKey;column:name;not null;size:16;"`
 	Password string `gorm:"not null;column:password;size:120;"`
-	email    string `gorm:"not null;column:email;size:30;"`
+	email    string `gorm:"uniqueKey;not null;column:email;size:30;"`
 }
 
 func GetUserById(id int64) (User, error) {
