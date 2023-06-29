@@ -18,9 +18,10 @@ func Ping(context *gin.Context) {
 }
 
 func Login(context *gin.Context) {
-	username := context.PostForm("user")
+	email := context.PostForm("email")
 	password := context.PostForm("password")
-	user, err := database.GetUserByNameAndPwd(username, password)
+	password = util.Decrypted(config.Conf.Security.Rsa.Private, password)
+	user, err := database.GetUserByEmailAndPwd(email, password)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
 			"message":   "Internal server error",

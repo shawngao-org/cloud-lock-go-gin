@@ -39,11 +39,11 @@ func GetUserByIdAndPwd(id int64, pwd string) (User, error) {
 	return user, nil
 }
 
-func GetUserByNameAndPwd(name string, pwd string) (User, error) {
+func GetUserByEmailAndPwd(email string, pwd string) (User, error) {
 	var user User
-	Db.Table("user").Limit(1).Find(&user, "name = ? AND password = ?", name, pwd)
+	Db.Table("user").Limit(1).Find(&user, "email = ? AND password = ?", email, pwd)
 	if reflect.DeepEqual(user, User{}) {
-		return User{}, errors.New("user not found or password is wrong")
+		return User{}, errors.New("电子邮件地址或密码错误")
 	}
 	return user, nil
 }
