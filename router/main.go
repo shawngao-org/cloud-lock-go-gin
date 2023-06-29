@@ -6,4 +6,5 @@ func LoadRouter(r *gin.Engine) {
 	RootRouter(r)
 	AdminRouter(r)
 	TotpRouter(r)
+	GetRsaPubKey(r)
 }
