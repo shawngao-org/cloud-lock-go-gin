@@ -9,6 +9,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/influxdata/influxdb-client-go/v2 v2.12.3
 	github.com/nacos-group/nacos-sdk-go v1.1.4
+	github.com/pquerna/otp v1.4.0
 	golang.org/x/net v0.10.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.5.0
@@ -49,7 +50,6 @@ require (
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/pquerna/otp v1.4.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
