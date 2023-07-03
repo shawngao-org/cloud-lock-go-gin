@@ -9,7 +9,7 @@ import (
 func TotpRouter(r *gin.Engine) {
 	authorized := r.Group("/totp", middleware.AuthMiddleware())
 	{
-		authorized.POST("/generateKey", controller.GetTotp)
-		authorized.POST("/generateCode", controller.GenerateCode)
+		authorized.GET("/generateKey", controller.GetTotp)
+		authorized.GET("/generateCode", controller.GenerateCode)
 	}
 }
