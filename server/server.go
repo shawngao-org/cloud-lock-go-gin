@@ -16,6 +16,7 @@ import (
 func HandleServer() {
 	r := gin.Default()
 	r.Use(middleware.RequestMiddleware())
+	r.Use(middleware.CORSMiddleware())
 	r.Use(middleware.ResponseMiddleware())
 	router.LoadRouter(r)
 	for _, info := range r.Routes() {
