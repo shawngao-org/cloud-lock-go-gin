@@ -1,0 +1,86 @@
+info:
+  contact: {}
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Email
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: Password(RSA Encrypted)
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Login
+      tags:
+      - User
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: Ping-Pong
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Ping pong
+      tags:
+      - Ping
+  /rsa/getPubKey:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get RSA public key string
+      tags:
+      - RSA
+  /totp/generateCode:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get TOTP code
+      tags:
+      - TOTP
+  /totp/generateKey:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get TOTP secret
+      tags:
+      - TOTP
+swagger: "2.0"

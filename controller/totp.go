@@ -6,6 +6,14 @@ import (
 	"net/http"
 )
 
+// GetTotp godoc
+// @Summary      Get TOTP secret
+// @Tags         TOTP
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  string
+// @Router       /totp/generateKey [get]
+// @securityDefinitions.basic BasicAuth
 func GetTotp(context *gin.Context) {
 	secret, err := util.Totp()
 	if err != nil {
@@ -20,6 +28,14 @@ func GetTotp(context *gin.Context) {
 	})
 }
 
+// GenerateCode godoc
+// @Summary      Get TOTP code
+// @Tags         TOTP
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  string
+// @Router       /totp/generateCode [get]
+// @securityDefinitions.basic BasicAuth
 func GenerateCode(context *gin.Context) {
 	secret := context.PostForm("secret")
 	code, err := util.GenerateCode(secret)

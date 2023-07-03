@@ -11,12 +11,29 @@ import (
 	"time"
 )
 
+// Ping godoc
+// @Summary      Ping pong
+// @Description  Ping-Pong
+// @Tags         Ping
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  string
+// @Router       /ping [get]
 func Ping(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"message": "pong!",
 	})
 }
 
+// Login godoc
+// @Summary      Login
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  string
+// @Param        email query string true "Email"
+// @Param        password query string true "Password(RSA Encrypted)"
+// @Router       /login [post]
 func Login(context *gin.Context) {
 	email := context.PostForm("email")
 	password := context.PostForm("password")
