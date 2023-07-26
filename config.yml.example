@@ -37,6 +37,13 @@ database:
     bucket: ''
 # 安全相关配置
 security:
+  # 密码
+  password:
+    # 加密方式: hmac512(需要私钥), hmac256(需要私钥), sha224(不需要私钥), sha256(不需要私钥), sha384(不需要私钥), sha512(不需要私钥),
+    # bcrypt(不需要私钥, 需要提供哈希次数 -> cost)
+    method: bcrypt
+    secret: ''
+    const: 10
   # JWT
   jwt:
     # 加密 JWT 的私钥
@@ -45,10 +52,10 @@ security:
     timeout: 2592000
   # RSA
   rsa:
-    # 公钥
-    public: ''
-    # 私钥
-    private: ''
+    # 公钥路径
+    public: ./public.pem
+    # 私钥路径
+    private: ./private.pem
 # NacOS 统一配置中心
 nacos:
   # 是否启用统一配置

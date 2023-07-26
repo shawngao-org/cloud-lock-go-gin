@@ -49,6 +49,11 @@ type Config struct {
 		} `yaml:"influxdb"`
 	} `yaml:"database"`
 	Security struct {
+		Password struct {
+			Method string `yaml:"method"`
+			Secret string `yaml:"secret"`
+			Cost   int    `yaml:"cost"`
+		} `yaml:"password"`
 		Jwt struct {
 			Secret  string `yaml:"secret"`
 			Timeout int64  `yaml:"timeout"`
