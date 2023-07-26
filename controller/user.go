@@ -7,6 +7,7 @@ import (
 	"cloud-lock-go-gin/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -37,7 +38,14 @@ func Ping(context *gin.Context) {
 func Login(context *gin.Context) {
 	email := context.PostForm("email")
 	password := context.PostForm("password")
-	password = util.Decrypted(config.Conf.Security.Rsa.Private, password)
+	pri, err := os.ReadFile(config.Conf.Security.Rsa.Private)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message":   "failed to read public key file",
+			"exception": err.Error(),
+		})
+	}
+	password = util.Decrypted(string(pri), password)
 	user, err := database.GetUserByEmailAndPwd(email, password)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{

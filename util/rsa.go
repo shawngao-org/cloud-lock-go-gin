@@ -6,9 +6,10 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/pem"
 )
 
-func Decrypted(base64Key string, base64String string) string {
+func Decrypted(key string, base64String string) string {
 	originStr, err := base64.StdEncoding.DecodeString(base64String)
 	if err != nil {
 		logger.LogErr("Unable to decode public key.")
@@ -16,13 +17,8 @@ func Decrypted(base64Key string, base64String string) string {
 		return ""
 	}
 	cipherText := originStr
-	privateKeyBytes, err := base64.StdEncoding.DecodeString(base64Key)
-	if err != nil {
-		logger.LogErr("Unable to decode private key.")
-		logger.LogErr("%s", err)
-		return ""
-	}
-	privateKey, err := x509.ParsePKCS8PrivateKey(privateKeyBytes)
+	privateKeyBlock, _ := pem.Decode([]byte(key))
+	privateKey, err := x509.ParsePKCS8PrivateKey(privateKeyBlock.Bytes)
 	if err != nil {
 		logger.LogErr("Unable to parse private key.")
 		logger.LogErr("%s", err)
@@ -41,15 +37,10 @@ func Decrypted(base64Key string, base64String string) string {
 	return string(decryptedText)
 }
 
-func Encrypted(base64Key string, str string) string {
+func Encrypted(key string, str string) string {
 	plainText := []byte(str)
-	publicKeyBytes, err := base64.StdEncoding.DecodeString(base64Key)
-	if err != nil {
-		logger.LogErr("Unable to decode public key.")
-		logger.LogErr("%s", err)
-		return ""
-	}
-	publicKey, err := x509.ParsePKIXPublicKey(publicKeyBytes)
+	publicKeyBlock, _ := pem.Decode([]byte(key))
+	publicKey, err := x509.ParsePKIXPublicKey(publicKeyBlock.Bytes)
 	if err != nil {
 		logger.LogErr("Unable to parse public key.")
 		logger.LogErr("%s", err)
