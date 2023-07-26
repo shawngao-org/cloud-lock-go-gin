@@ -1,8 +1,11 @@
 package database
 
 import (
+	"cloud-lock-go-gin/config"
+	"cloud-lock-go-gin/util"
 	"errors"
 	"reflect"
+	"strings"
 )
 
 type User struct {
@@ -41,9 +44,26 @@ func GetUserByIdAndPwd(id int64, pwd string) (User, error) {
 
 func GetUserByEmailAndPwd(email string, pwd string) (User, error) {
 	var user User
-	Db.Table("user").Limit(1).Find(&user, "email = ? AND password = ?", email, pwd)
+	Db.Table("user").Limit(1).Find(&user, "email = ?", email)
 	if reflect.DeepEqual(user, User{}) {
-		return User{}, errors.New("电子邮件地址或密码错误")
+		return User{}, errors.New("invalid email address")
 	}
-	return user, nil
+	if strings.ToUpper(config.Conf.Security.Password.Method) == "BCRYPT" {
+		e := util.CheckBcrypt(pwd, user.Password)
+		if e == nil {
+			user.Password = ""
+			return user, nil
+		} else {
+			return User{}, errors.New("invalid password")
+		}
+	}
+	str, err := util.PasswordEncrypt(pwd)
+	if err != nil {
+		return User{}, err
+	}
+	if str == user.Password {
+		user.Password = ""
+		return user, nil
+	}
+	return User{}, errors.New("invalid password")
 }
