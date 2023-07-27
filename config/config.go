@@ -2,6 +2,8 @@ package config
 
 import (
 	"cloud-lock-go-gin/logger"
+	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
@@ -142,18 +144,12 @@ func nacosMain(config Config) {
 		"serverConfigs": sc,
 		"clientConfig":  cc,
 	})
-	if err != nil {
-		logger.LogErr("%s", err)
-		os.Exit(-1)
-	}
+	configClientErrHandle(err)
 	content, err := configClient.GetConfig(vo.ConfigParam{
 		DataId: config.Nacos.DataId,
 		Group:  config.Nacos.Group,
 	})
-	if err != nil {
-		logger.LogErr("%s", err)
-		os.Exit(-1)
-	}
+	configClientErrHandle(err)
 	err = configClient.ListenConfig(vo.ConfigParam{
 		DataId: config.Nacos.DataId,
 		Group:  config.Nacos.Group,
@@ -163,37 +159,51 @@ func nacosMain(config Config) {
 			configMutex.Lock()
 			Conf = parseContent2Config([]byte(data))
 			configMutex.Unlock()
-			if runtime.GOOS == "linux" {
-				logger.LogWarn("The server is restarting, please wait a few seconds...")
-				cmd := exec.Command("sh", "-c", "sleep 3 && exit 0")
-				cmd.Stdout = os.Stdout
-				cmd.Stderr = os.Stderr
-				if err := cmd.Start(); err != nil {
-					logger.LogErr("Error starting command: %s", err)
-					os.Exit(1)
-				}
-				if err := cmd.Wait(); err != nil {
-					logger.LogErr("Command finished with error: %s", err)
-				}
-				time.Sleep(1 * time.Second)
-				binary, err := exec.LookPath(os.Args[0])
-				if err != nil {
-					logger.LogErr("Can't get executable binary.")
-					logger.LogErr("Need to manually restart the server.")
-					logger.LogErr("%s", err)
-				}
-				err = syscall.Exec(binary, os.Args, os.Environ())
-				if err != nil {
-					logger.LogErr("Need to manually restart the server.")
-					logger.LogErr("%s", err)
-				}
-			} else {
-				logger.LogErr("Need to manually restart the server.")
-				logger.LogErr("Config hot reload is not support Windows OS.")
+			err := restart()
+			if err != nil {
+				logger.LogErr(err.Error())
 			}
 		},
 	})
 	configMutex.Lock()
 	Conf = parseContent2Config([]byte(content))
 	configMutex.Unlock()
+}
+
+func executeRestart() error {
+	cmd := exec.Command("sh", "-c", "sleep 3 && exit 0")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("error starting command: %s", err)
+	}
+	return nil
+}
+
+func restart() error {
+	if runtime.GOOS == "linux" {
+		return errors.New("config hot reload is not support Windows OS")
+	}
+	logger.LogWarn("The server is restarting, please wait a few seconds...")
+	err := executeRestart()
+	if err != nil {
+		return fmt.Errorf("failed to execute restart comand: %s", err)
+	}
+	time.Sleep(1 * time.Second)
+	binary, err := exec.LookPath(os.Args[0])
+	if err != nil {
+		return fmt.Errorf("can't get executable binary: %s", err)
+	}
+	err = syscall.Exec(binary, os.Args, os.Environ())
+	if err != nil {
+		return fmt.Errorf("failed to restart server: %s", err)
+	}
+	return nil
+}
+
+func configClientErrHandle(err error) {
+	if err != nil {
+		logger.LogErr(err.Error())
+		os.Exit(-1)
+	}
 }

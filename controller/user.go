@@ -49,7 +49,7 @@ func Login(context *gin.Context) {
 	user, err := database.GetUserByEmailAndPwd(email, password)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
-			"message":   "Internal server error",
+			"message":   http.StatusText(http.StatusInternalServerError),
 			"exception": err.Error(),
 		})
 		return
@@ -57,7 +57,7 @@ func Login(context *gin.Context) {
 	token, err := util.GenerateToken(user.Id)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
-			"message":   "Internal server error",
+			"message":   http.StatusText(http.StatusInternalServerError),
 			"exception": err,
 		})
 		return
@@ -69,7 +69,7 @@ func Login(context *gin.Context) {
 	).Err()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
-			"message":   "Internal server error",
+			"message":   http.StatusText(http.StatusInternalServerError),
 			"exception": err,
 		})
 		return
